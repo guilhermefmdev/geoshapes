@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "geoshapes"
+version = "0.1.0"
+description = ""
+authors = ["Guilherme Moraes <guiferreiramoraes@outlook.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+shapely = "^2.0.4"
+django = "^5.0.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
