@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	{# imports maplibre-gl script and stylesheet for map integration #}
+
+	<link rel='stylesheet' href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css'>
+	<script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'></script>	
+	
+	<style>
+			#map-container { height: 100%; }
+			#map { height: 60%; width: 60%; margin: 20px auto;}
+	</style>
+	
+	<div id='map-container'>
+		<div id='map'></div>
+	</div>
+
+<script>
+	const map = new maplibregl.Map({
+    container: 'map', // container id
+    style: 'https://demotiles.maplibre.org/style.json', // style URL
+    center: [0, 0], // starting position [lng, lat]
+    zoom: 1 // starting zoom
+	});
+
+</script>
+{% endblock %}
