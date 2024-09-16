@@ -1,11 +1,8 @@
 {% extends 'base.html' %}
-
 {% block content %}
 	{# imports maplibre-gl script and stylesheet for map integration #}
-
-	<link rel='stylesheet' href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css'>
-	<script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'></script>	
-		
+	<link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
+	<script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>	
 	<style>
 			#map-container { height: 100%; padding: 20px 0;}
 			#map { height: 60%; width: 60%; margin: 0 auto;}
@@ -14,14 +11,20 @@
 	<div id='map-container'>
 		<div id='map'></div>
 	</div>
-
-<script>
-	const map = new maplibregl.Map({
-    container: 'map', // container id
-    style: 'https://demotiles.maplibre.org/style.json', // style URL
-    center: [0, 0], // starting position [lng, lat]
-    zoom: 1 // starting zoom
-	});
-
-</script>
+	
+	{{ MAPBOX_TOKEN|json_script:"token" }}	
+	<script>
+		const token = JSON.parse(document.getElementById('token').textContent) 
+		console.log(token)	
+		
+		mapboxgl.accessToken = `${token}`;
+			const map = new mapboxgl.Map({
+					container: 'map',
+					style: 'mapbox://styles/mapbox/streets-v9',
+					projection: 'globe', // Display the map as a globe, since satellite-v9 defaults to Mercator
+					zoom: 1,
+					center: [30, 15],
+					attributionControl: false,
+			});
+	</script>
 {% endblock %}
