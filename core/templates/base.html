@@ -12,12 +12,10 @@
 	<body>    
 			{% load django_bootstrap5 %}
 			{% bootstrap_css %}
-			<div class='w-100 bg-primary-subtle p-3'>
-				<b>
-					Geoshapes
-				</b>
+			<div class='w-100 bg-dark p-3'>
+				<span class='text-light fw-bold'>Geoshapes</span>
 			</div>
-			<div id='main-content' class='bg-body-secondary'>
+			<div id='main-content' class='bg-dark-subtle'>
 				{% block content %}{% endblock %}
 			</div>	
 	</body>
