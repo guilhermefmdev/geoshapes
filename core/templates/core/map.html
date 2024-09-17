@@ -4,8 +4,8 @@
 	<link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
 	<script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>	
 	<style>
-		#map-container { height: 100%; padding: 20px 0;}
-		#map { height: 65%; width: 65%; margin: 0 auto;}
+		#map-container { height: 100%; padding: 5% 0 0;}
+		#map { height: 80%; width: 80%; margin: 0 auto; max-width: 1000px;}
 	</style>
 	
 	<div id='map-container'>
@@ -22,7 +22,7 @@
 				container: 'map',
 				style: 'mapbox://styles/mapbox/streets-v9',
 				projection: 'globe', // Display the map as a globe, since satellite-v9 defaults to Mercator
-				zoom: 1,
+				zoom: 0,
 				center: [30, 15],
 				attributionControl: false,
 			});
