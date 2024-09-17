@@ -1,6 +1,5 @@
-from django.http import HttpResponse
+from django.shortcuts import render
+from django.conf import settings
 
-# Create your views here.
-
-def main(request):
-    return HttpResponse("Oi, Tudo bem?")
+def map(request):
+    return render(request, 'core/map.html', {'MAPBOX_TOKEN': settings.MAPBOX_TOKEN})
