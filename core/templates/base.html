@@ -8,6 +8,7 @@
 	<style>
 		body { margin: 0; padding: 0; }
 		html, body, #main-content { height: 100%; }
+		.main-content-bg { background-color: lightgrey;}
 	</style>
 	<body>    
 		{% load django_bootstrap5 %}
@@ -16,7 +17,7 @@
 			<span class='text-light fw-bold'>Geoshapes</span>
 			<span class='text-light fw-light'>Fun with geographic features!<span>
 		</div>
-		<div id='main-content' class='bg-dark-subtle'>
+		<div id='main-content' class='main-content-bg'>
 			{% block content %}{% endblock %}
 		</div>	
 	</body>
