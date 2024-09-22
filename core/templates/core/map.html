@@ -3,18 +3,24 @@
 	{# imports maplibre-gl script and stylesheet for map integration #}
 	<link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet">
 	<script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>	
+	<script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+	<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
+	<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css" type="text/css">
 	<style>
 		#map-container { height: 100%; position: relative}
-		#map { height: 80%; width: 80%; margin: 0 auto; max-width: 1000px; }
-		#start-title {	position: absolute; top: 15%; left: 46.5%; }
-		.transition-ease { transition: all 2s ease-out; }
+		#map { height: 100%; width: 100%; margin: 0 auto; }
+		#start-title { position: absolute; top: 15%; left: 45.9%; }
+		.transition-ease { transition: all 1.5s ease-out; }
 		.hidden { opacity: 0 }
-		.cursor-pointer { cursor: pointer; }	  
+		.cursor-grab { cursor: grab; }
+		button[disabled] {
+			opacity: 0.4;
+		}
 	</style>
 	
 	<div id='map-container'>
-		<div id='map' class='transition-ease hidden cursor-pointer'></div>
-		<span id='start-title' class='transition-ease cursor-pointer'>Click to start</span>
+		<div id='map' class='transition-ease hidden'></div>
+		<span id='start-title' class='transition-ease cursor-grab text-light'>Click to start</span>
 	</div>
 
 	{{ MAPBOX_TOKEN|json_script:"token" }}	
@@ -25,36 +31,152 @@
 		mapboxgl.accessToken = `${token}`;
 		const map = new mapboxgl.Map({
 			container: 'map',
-			style: 'mapbox://styles/mapbox/streets-v9',
+			style: 'mapbox://styles/mapbox/satellite-streets-v12',
 			projection: 'globe', // Display the map as a globe, since satellite-v9 defaults to Mercator
 			zoom: 0.7,
-			center: [15, 80],
+			center: [15, 15],
 			attributionControl: false,
 			animate: true
 		});
+		
+		// Old globe rotation function 	
+		//	let id
+		//	function rotateCamera(timestamp) {
+		//		// rotate at approximately ~10 degrees per second
+		//		map.rotateTo((timestamp / 150) % 360, { duration: 0, });
+		//		// request the next frame of the animation
+		//		id = requestAnimationFrame(rotateCamera);
+		//	}
+		
+		// At low zooms, complete a revolution every two minutes.
+    const secondsPerRevolution = 200;
+    // Above zoom level 5, do not rotate.
+    const maxSpinZoom = 5;
+    // Rotate at intermediate speeds between zoom levels 3 and 5.
+    const slowSpinZoom = 3;
 
-		let id
-		function rotateCamera(timestamp) {
-			// rotate at approximately ~10 degrees per second
-			map.rotateTo((timestamp / 150) % 360, { duration: 0, });
-			// request the next frame of the animation
-			id = requestAnimationFrame(rotateCamera);
+    let userInteracting = false;
+    const spinEnabled = true;
+		function spinGlobe() {
+        const zoom = map.getZoom();
+        if (spinEnabled && !userInteracting && zoom < maxSpinZoom) {
+            let distancePerSecond = 360 / secondsPerRevolution;
+            if (zoom > slowSpinZoom) {
+                // Slow spinning at higher zooms
+                const zoomDif =
+                    (maxSpinZoom - zoom) / (maxSpinZoom - slowSpinZoom);
+                distancePerSecond *= zoomDif;
+            }
+            const center = map.getCenter();
+            center.lng -= distancePerSecond;
+            // Smoothly animate the map over one second.
+            // When this animation is complete, it calls a 'moveend' event.
+            map.easeTo({ center, duration: 1000, easing: (n) => n });
+        }
+    }
+		// Pause spinning on interaction
+    map.on('mousedown', () => {
+        userInteracting = true;
+    });
+    map.on('dragstart', () => {
+        userInteracting = true;
+    });
+
+    // When animation is complete, start spinning if there is no ongoing interaction
+    map.on('moveend', () => {
+        spinGlobe();
+    });
+		
+		function toggleCtrlDraw(param) {
+			mapboxCtrlDrawBtns = document.querySelectorAll('.mapbox-gl-draw_ctrl-draw-btn')	
+			if (param == false) {
+				mapboxCtrlDrawBtns.forEach((btn) => {
+					btn.setAttribute('disabled', '')
+				})	
+			} else {
+				mapboxCtrlDrawBtns.forEach((btn) => {
+					btn.removeAttribute('disabled', '')
+				})	
+			}
 		}
-
+		
 		map.on('load', () => {
 			mapdiv.classList.remove('hidden')
 			// start the animation
-			rotateCamera(0);
+			map.scrollZoom.disable();
+			spinGlobe();
 		})
 
 		// map navigation controls
 		// map.addControl(new mapboxgl.NavigationControl());
-
+		
+		// Initialize the GeolocateControl.
+		const geolocate = new mapboxgl.GeolocateControl({
+				positionOptions: {
+						enableHighAccuracy: true
+				},
+				trackUserLocation: true
+		});
+		// Set an event listener that fires
+		// when a geolocate event occurs.
+		geolocate.on('geolocate', () => {
+			console.log('A geolocate event has occurred.');
+		});
+		
+		firstClick = false
 		map.on('click', () => {
-			cancelAnimationFrame(id)
-			document.getElementById('start-title').classList.add('hidden')
-			map.flyTo({center: [-53, -12], zoom: 3, pitch: 0, duration: 4500, bearing: 0})
-			mapdiv.classList.remove('cursor-pointer')
+			if (firstClick == false) {
+				firstClick = true	
+				document.getElementById('start-title').classList.add('hidden')
+				map.flyTo({center: [-53, -12], zoom: 3, pitch: 0, duration: 4500, bearing: 0})
+				map.addControl(geolocate);
+				map.scrollZoom.enable();
+				map.addControl(draw)
+				toggleCtrlDraw(false)
+			}
 		})
+		
+
+		const draw = new MapboxDraw({
+			displayControlsDefault: false,
+			// Select which mapbox-gl-draw control buttons to add to the map.
+			controls: {
+					polygon: true,
+					line: true,
+					point: true,
+					trash: true
+			},
+    });
+		
+		map.on('zoom', () => {
+			map_zoom = map.getZoom()
+			if (map_zoom > 10) {
+				toggleCtrlDraw(true)
+			}	else {
+				toggleCtrlDraw(false)
+			}
+		})
+
+	// Adicionar processamento da área selecionada após criação de tooltip de infos
+	// map.on('draw.create', updateArea);
+	// map.on('draw.delete', updateArea);
+	// map.on('draw.update', updateArea);
+
+	// function updateArea(e) {
+	// 	const data = draw.getAll();
+	// 	const answer = document.getElementById('calculated-area');
+	// 	if (data.features.length > 0) {
+	// 			const area = turf.area(data);
+	// 			// Restrict the area to 2 decimal points.
+	// 			const rounded_area = Math.round(area * 100) / 100;
+	// 			answer.innerHTML = `<p><strong>${rounded_area}</strong></p><p>square meters</p>`;
+	// 	} else {
+	// 			answer.innerHTML = '';
+	// 			if (e.type !== 'draw.delete')
+	// 					alert('Click the map to draw a polygon.');
+	// 	}
+	// }
+
+
 	</script>
 {% endblock %}
