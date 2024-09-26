@@ -136,8 +136,8 @@
 					text.classList.add('hidden')
 				})
 				map.flyTo({center: [-53, -12], zoom: 3, pitch: 0, duration: 4500, bearing: 0})
-				map.addControl(geolocate);
-				map.addControl(draw)
+				map.addControl(geolocate, 'bottom-right');
+				map.addControl(draw, 'bottom-right')
 				toggleCtrlDraw(false)
 
 				map.scrollZoom.enable();
