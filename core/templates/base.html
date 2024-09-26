@@ -9,15 +9,15 @@
 	</head>
 	<style>
 		body { margin: 0; padding: 0; }
-		html, body, #main-content { height: 94vh; }
+		html, body, #main-content { height: 100vh; }
 		.main-content-bg { background-color: black;}
 	</style>
 	<body>    
 		{% load django_bootstrap5 %}
 		{% bootstrap_css %}
-		<div class='w-100 bg-dark p-3 d-flex justify-content-between'>
+		<div class='w-100 p-3 d-flex fixed-top justify-content-between'>
 			<span class='text-light fw-bold'><i class="fa-solid fa-earth-americas"></i> geoshapes</span>
-			<span class='text-light fw-light'>Fun with geographic features!<span>
+			<span class='start-text text-light fw-light transition-ease'><i>Fun with geographic features!</i><span>
 		</div>
 		<div id='main-content' class='main-content-bg'>
 			{% block content %}{% endblock %}

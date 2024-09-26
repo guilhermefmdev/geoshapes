@@ -9,7 +9,7 @@
 	<style>
 		#map-container { height: 100%; position: relative}
 		#map { height: 100%; width: 100%; margin: 0 auto; }
-		#start-title { position: absolute; top: 15%; left: 45.9%; }
+		.center-text { position: absolute; top: 15%; left: 45.9%; }
 		.transition-ease { transition: all 1.5s ease-out; }
 		.hidden { opacity: 0 }
 		.cursor-grab { cursor: grab; }
@@ -20,7 +20,7 @@
 	
 	<div id='map-container'>
 		<div id='map' class='transition-ease hidden'></div>
-		<span id='start-title' class='transition-ease cursor-grab text-light'>Click to start</span>
+		<span class='start-text transition-ease cursor-grab text-light center-text'>Click to start</span>
 	</div>
 
 	{{ MAPBOX_TOKEN|json_script:"token" }}	
@@ -131,7 +131,10 @@
 		map.on('click', () => {
 			if (firstClick == false) {
 				firstClick = true	
-				document.getElementById('start-title').classList.add('hidden')
+				startTexts = document.querySelectorAll('.start-text')
+				startTexts.forEach((text) => {
+					text.classList.add('hidden')
+				})
 				map.flyTo({center: [-53, -12], zoom: 3, pitch: 0, duration: 4500, bearing: 0})
 				map.addControl(geolocate);
 				map.addControl(draw)
