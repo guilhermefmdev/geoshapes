@@ -25,7 +25,8 @@
 
 	{{ MAPBOX_TOKEN|json_script:"token" }}	
 	<script>
-		mapdiv = document.getElementById('map') const token = JSON.parse(document.getElementById('token').textContent) 
+		const mapdiv = document.getElementById('map') 
+		const token = JSON.parse(document.getElementById('token').textContent) 
 
 		mapboxgl.accessToken = `${token}`;
 		const map = new mapboxgl.Map({
@@ -62,8 +63,7 @@
             let distancePerSecond = 360 / secondsPerRevolution;
             if (zoom > slowSpinZoom) {
                 // Slow spinning at higher zooms
-                const zoomDif =
-                    (maxSpinZoom - zoom) / (maxSpinZoom - slowSpinZoom);
+                const zoomDif = (maxSpinZoom - zoom) / (maxSpinZoom - slowSpinZoom);
                 distancePerSecond *= zoomDif;
             }
             const center = map.getCenter();
