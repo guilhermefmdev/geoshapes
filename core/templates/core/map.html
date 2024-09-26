@@ -25,8 +25,7 @@
 
 	{{ MAPBOX_TOKEN|json_script:"token" }}	
 	<script>
-		mapdiv = document.getElementById('map')
-		const token = JSON.parse(document.getElementById('token').textContent) 
+		mapdiv = document.getElementById('map') const token = JSON.parse(document.getElementById('token').textContent) 
 
 		mapboxgl.accessToken = `${token}`;
 		const map = new mapboxgl.Map({
@@ -104,6 +103,11 @@
 			mapdiv.classList.remove('hidden')
 			// start the animation
 			map.scrollZoom.disable();
+			map.boxZoom.disable();
+			map.doubleClickZoom.disable();
+			map.touchZoomRotate.disable();
+			map.dragRotate.disable();
+			map.dragPan.disable();
 			spinGlobe();
 		})
 
@@ -130,12 +134,17 @@
 				document.getElementById('start-title').classList.add('hidden')
 				map.flyTo({center: [-53, -12], zoom: 3, pitch: 0, duration: 4500, bearing: 0})
 				map.addControl(geolocate);
-				map.scrollZoom.enable();
 				map.addControl(draw)
 				toggleCtrlDraw(false)
+
+				map.scrollZoom.enable();
+				map.boxZoom.enable();
+				map.doubleClickZoom.enable();
+				map.touchZoomRotate.enable();
+				map.dragRotate.enable();
+				map.dragPan.enable();
 			}
 		})
-		
 
 		const draw = new MapboxDraw({
 			displayControlsDefault: false,
